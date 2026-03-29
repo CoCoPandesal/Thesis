@@ -4,6 +4,8 @@ import 'home_page.dart';
 import 'register_page.dart';
 import '../constants/app_colors.dart';
 import '../widgets/curve_painter.dart';
+import '../services/api_service.dart';
+
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -16,6 +18,9 @@ class _LoginPageState extends State<LoginPage> {
   bool obscurePassword = true;
   bool showUsernameError = false;
   bool showPasswordError = false;
+
+final TextEditingController username = TextEditingController();
+final TextEditingController password = TextEditingController();
 
   // Background image carousel
   final PageController _pageController = PageController();
@@ -53,6 +58,8 @@ class _LoginPageState extends State<LoginPage> {
   void dispose() {
     _timer?.cancel();
     _pageController.dispose();
+    username.dispose();
+    password.dispose();
     super.dispose();
   }
 
@@ -297,7 +304,27 @@ class _LoginPageState extends State<LoginPage> {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: _login,
+                          onPressed: () async {
+                        var result = await ApiService.login(
+                          username.text,
+                          password.text,
+                        );
+
+                        if (result["success"] == true) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text("Login successful!")),
+                          );
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(builder: (context) => const HomePage()),
+                            (route) => false,
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("Login failed: ${result["error"]}")),
+                          );
+                        }
+                      },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primaryCyan,
                             foregroundColor: Colors.black,

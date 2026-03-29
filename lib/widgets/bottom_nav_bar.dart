@@ -50,8 +50,9 @@ class BottomNavBar extends StatelessWidget {
     final isSelected = currentIndex == index;
     return GestureDetector(
       onTap: () {
-        if (index == currentIndex)
+        if (index == currentIndex) {
           return; // Prevent navigating to the same page
+        }
 
         // Trigger navigation based on the selected tab index
         if (index == 0) {

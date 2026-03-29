@@ -4,6 +4,7 @@ import 'home_page.dart';
 import 'login_page.dart';
 import '../constants/app_colors.dart';
 import '../widgets/curve_painter.dart';
+import '../services/api_service.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -17,6 +18,10 @@ class _RegisterPageState extends State<RegisterPage> {
   bool obscureRePassword = true;
   bool showUsernameError = false;
   bool showPasswordError = false;
+
+  final TextEditingController username = TextEditingController();
+  final TextEditingController password = TextEditingController();
+  final TextEditingController confirmPassword = TextEditingController();
 
   // Background image carousel
   final PageController _pageController = PageController();
@@ -54,6 +59,9 @@ class _RegisterPageState extends State<RegisterPage> {
   void dispose() {
     _timer?.cancel();
     _pageController.dispose();
+    username.dispose();
+    password.dispose();
+    confirmPassword.dispose();
     super.dispose();
   }
 
@@ -335,7 +343,40 @@ class _RegisterPageState extends State<RegisterPage> {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: _register,
+                          onPressed: () async {
+                          if (password.text != confirmPassword.text) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Passwords do not match")),
+                            );
+                            return;
+                          }
+
+                          try {
+                            var result = await ApiService.register(
+                              username.text,
+                              password.text,
+                            );
+
+                            if (result["success"] == true) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text("Registration successful! Please log in.")),
+                              );
+                              Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(builder: (context) => const LoginPage()),
+                                (route) => false,
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text("Error: ${result["error"]}")),
+                              );
+                            }
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("Network error: $e")),
+                            );
+                          }
+                        },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primaryCyan,
                             foregroundColor: Colors.black,

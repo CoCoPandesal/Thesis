@@ -51,14 +51,18 @@ class MockFeedbackService {
   // ── Message generators ──────────────────────────────────────────────────────
 
   String _overallMessage(double score) {
-    if (score >= 88)
+    if (score >= 88) {
       return 'Excellent performance! Your pitch control is very solid.';
-    if (score >= 72)
+    }
+    if (score >= 72) {
       return 'Good effort — strong in most sections with a few spots to refine.';
-    if (score >= 55)
+    }
+    if (score >= 55) {
       return 'Decent attempt — with focused practice you\'ll improve quickly.';
-    if (score >= 35)
+    }
+    if (score >= 35) {
       return 'Keep at it — the foundation is there, just needs more repetition.';
+    }
     return 'Early days yet — try humming along first to lock in the melody.';
   }
 
